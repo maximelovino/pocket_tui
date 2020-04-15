@@ -3,6 +3,8 @@ import os
 import webbrowser
 import requests
 import json
+from entry import Entry
+from typing import List
 
 
 BASE_POCKET_URL = "https://getpocket.com/v3/"
@@ -55,21 +57,29 @@ class Pocket():
         access_token = access_token_request.json()['access_token']
         return access_token
 
-    def retrieve_list(self, domain: str, count: int):
+    def retrieve_full_list(self) -> List[Entry]:
         get_url = f"{BASE_POCKET_URL}get"
         get_payload = {"consumer_key": self.key,
-                       "access_token": self.token, "domain": domain, "count": count, "sort": "newest"}
+                       "access_token": self.token, "sort": "newest"}
         get_request = requests.get(
             get_url, data=json.dumps(get_payload), headers=BASE_HEADERS)
         response = get_request.json()
         dictionnary = response['list']
-        return list(dictionnary.values())
+        entries = Entry.parse_list(dictionnary.values())
+        return entries
+    
+    def archive(self, entry: Entry):
+        actions = [{"action": "archive", "item_id": entry.id}]
+        self.send_actions(actions)
 
-    def archive(self, item_id):
-        print(f"Archiving {item_id}")
-        archive_url = f"{BASE_POCKET_URL}send"
+    def bulk_delete(self, entries: List[Entry]):
+        actions = [{'action': 'delete', "item_id": entry.id} for entry in entries]
+        self.send_actions(actions)
+
+    def send_actions(self, actions: List):
+        send_url = f"{BASE_POCKET_URL}send"
         payload = {"consumer_key": self.key, "access_token": self.token,
-                   "actions": [{"action": "archive", "item_id": item_id}]}
+                   "actions": actions}
         request = requests.get(
-            archive_url, data=json.dumps(payload), headers=BASE_HEADERS)
+            send_url, data=json.dumps(payload), headers=BASE_HEADERS)
         print(request.json())
