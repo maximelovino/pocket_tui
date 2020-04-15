@@ -1,3 +1,5 @@
 venv/
 .env
 .vim/
+.token
+__pycache__/
