@@ -68,11 +68,11 @@ class Pocket():
         entries = Entry.parse_list(dictionnary.values())
         return entries
     
-    def archive(self, entry: Entry):
-        actions = [{"action": "archive", "item_id": entry.id}]
+    def archive(self, entries: List[Entry]):
+        actions = [{'action': 'archive', "item_id": entry.id} for entry in entries]
         self.send_actions(actions)
 
-    def bulk_delete(self, entries: List[Entry]):
+    def delete(self, entries: List[Entry]):
         actions = [{'action': 'delete', "item_id": entry.id} for entry in entries]
         self.send_actions(actions)
 

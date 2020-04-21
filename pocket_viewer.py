@@ -31,7 +31,7 @@ def watch_youtube(videos: List[VideoEntry], pocket_client: Pocket):
     # TODO replace with inquirer confirm
     to_delete = input("Do you want to archive the entry?[y/N]")
     if to_delete == 'y':
-        pocket_client.archive(chosen)
+        pocket_client.archive([chosen])
 
 
 def group_by_year(entries: List[Entry]) -> Dict[str, List[Entry]]:
@@ -95,12 +95,12 @@ def delete_by_year(by_year: Dict[str, List[Entry]]) -> None:
     if answers['confirm']:
         year = answers['year_to_delete']
         print(f"Bulk-deleting entries from {year}")
-        pocket_client.bulk_delete(by_year[year])
+        pocket_client.delete(by_year[year])
     else:
         print("Deletion NOT confirmed")
 
 
-def bulk_operations(entries: List[Entry]) -> None:
+def bulk_operations(entries: List[Entry], client: Pocket) -> None:
     questions = [
         {
             'type': 'checkbox',
@@ -122,11 +122,24 @@ def bulk_operations(entries: List[Entry]) -> None:
     ]
     answers = prompt(questions)
     print(answers)
+    chosen = answers['chosen_entries']
     if answers["operation"] == "open":
-        chosen = answers['chosen_entries']
         for x in chosen:
             x.open()
-
+    else:
+        questions = [
+            {
+                'type': 'confirm',
+                'name': 'confirm',
+                'message': 'Confirm bulk operation?'
+            }
+        ]
+        confirm = prompt(questions)
+        if confirm["confirm"]:
+            if answers["operation"] == "archive":
+                client.archive(chosen)
+            elif answers["operation"] == "delete":
+                client.delete(chosen)
 
 
 running = True
@@ -146,6 +159,6 @@ while running:
     elif menu_choice == 'youtube':
         watch_youtube(youtube_list, pocket_client)
     elif menu_choice == 'bulk':
-        bulk_operations(full_list)
+        bulk_operations(full_list, pocket_client)
     else:
         print("You broke the menu")
