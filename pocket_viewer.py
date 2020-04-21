@@ -10,21 +10,21 @@ from typing import List, Dict, Tuple
 from entry import Entry, VideoEntry, ArticleEntry
 
 
-def choose_video(xs: List[Entry]):
+def choose_video(xs: List[VideoEntry]) -> VideoEntry:
     questions = [
         {
             'type': 'list',
             'name': 'video_choice',
             'message': 'What do you want to play?',
             'choices': [
-                {'name': x.title, 'value': x} for x in xs]
+                {'name': x.list_str(), 'value': x} for x in xs]
         }
     ]
     answers = prompt(questions)
     return answers['video_choice']
 
 
-def watch_youtube(videos: List[Entry], pocket_client: Pocket):
+def watch_youtube(videos: List[VideoEntry], pocket_client: Pocket):
     chosen = choose_video(videos)
     print(chosen)
     os.system(f"mpv {chosen.url}")
@@ -48,7 +48,7 @@ def filter_youtube(entries: List[Entry]) -> List[Entry]:
     return list(filter(lambda x: isinstance(x, VideoEntry), entries))
 
 
-def refresh(pocket_client: Pocket) -> Tuple[List[Entry], Dict[str, List[Entry]], List[Entry]]:
+def refresh(pocket_client: Pocket) -> Tuple[List[Entry], Dict[str, List[Entry]], List[VideoEntry]]:
     full_list = pocket_client.retrieve_full_list()
     by_year = group_by_year(full_list)
     youtube_list = filter_youtube(full_list)
@@ -64,7 +64,7 @@ def main_menu() -> str:
             'message': 'What do you want to do?',
             'choices': [
                 {'name': "Watch YouTube videos", 'value': 'youtube'},
-                {'name': "Bulk-archive", 'value': 'archive'},
+                {'name': "Bulk operations", 'value': 'bulk'},
                 {'name': "Bulk-delete by year", 'value': 'delete_year'},
                 {'name': "Refresh", 'value': 'refresh'},
                 {'name': "Quit", 'value': 'quit'}
@@ -75,7 +75,7 @@ def main_menu() -> str:
     return answers['menu_choice']
 
 
-def delete_by_year(by_year):
+def delete_by_year(by_year: Dict[str, List[Entry]]) -> None:
     questions = [
         {
             'type': 'list',
@@ -100,6 +100,30 @@ def delete_by_year(by_year):
         print("Deletion NOT confirmed")
 
 
+def bulk_operations(entries: List[Entry]) -> None:
+    questions = [
+        {
+            'type': 'checkbox',
+            'name': 'chosen_entries',
+            'message': 'Select entries',
+            'choices': [
+                {'name': x.list_str(), 'value': x} for x in entries]
+        },
+        {
+            'type': 'list',
+            'name': 'operation',
+            'message': 'Select operation',
+            'choices': [
+                {'name': "Open", 'value': "open"},
+                {'name': "Archive", 'value': "archive"},
+                {'name': "Delete", 'value': "delete"},
+            ]
+        },
+    ]
+    answers = prompt(questions)
+    print(answers)
+
+
 running = True
 
 pocket_client = Pocket()
@@ -116,7 +140,7 @@ while running:
         delete_by_year(by_year)
     elif menu_choice == 'youtube':
         watch_youtube(youtube_list, pocket_client)
-    elif menu_choice == 'archive':
-        print("Archive still in dev")
+    elif menu_choice == 'bulk':
+        bulk_operations(full_list)
     else:
         print("You broke the menu")

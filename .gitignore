@@ -3,3 +3,4 @@ venv/
 .vim/
 .token
 __pycache__/
+youtube_tmp/
