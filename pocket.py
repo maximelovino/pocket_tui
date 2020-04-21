@@ -20,7 +20,7 @@ class Pocket():
         load_dotenv()
         self.key = os.getenv('POCKET_CONSUMER_KEY')
         self.token = self.cached_authentication()
-        print(f"Authenticated with key {self.key} and token {self.token}")
+        # print(f"Authenticated with key {self.key} and token {self.token}")
 
     def cached_authentication(self) -> str:
         if os.path.exists(TOKEN_CACHE_FILE):

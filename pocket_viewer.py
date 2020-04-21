@@ -7,7 +7,7 @@ from PyInquirer import prompt
 import time
 from pocket import Pocket
 from typing import List, Dict, Tuple
-from entry import Entry
+from entry import Entry, VideoEntry, ArticleEntry
 
 
 def choose_video(xs: List[Entry]):
@@ -45,7 +45,7 @@ def group_by_year(entries: List[Entry]) -> Dict[str, List[Entry]]:
 
 
 def filter_youtube(entries: List[Entry]) -> List[Entry]:
-    return list(filter(lambda x: 'youtube.com' in x.url or 'youtu.be' in x.url, entries))
+    return list(filter(lambda x: isinstance(x, VideoEntry), entries))
 
 
 def refresh(pocket_client: Pocket) -> Tuple[List[Entry], Dict[str, List[Entry]], List[Entry]]:
