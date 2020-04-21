@@ -1,4 +1,5 @@
 from datetime import datetime
+import webbrowser
 from urllib.parse import urlparse, parse_qs
 import tldextract
 from typing import List, Tuple
@@ -53,6 +54,9 @@ class Entry():
     def list_str(self) -> str:
         pass
 
+    def open(self):
+        pass
+
     def __str__(self):
         return f"{self.id}\n{self.title}\n{self.url}\nAdded:{self.added} - Updated: {self.updated}\nDomain: {self.domain}"
 
@@ -63,6 +67,9 @@ class ArticleEntry(Entry):
 
     def list_str(self):
         return f"{self.title} // {self.domain}"
+
+    def open(self):
+        webbrowser.open(self.url, new=2, autoraise=False)
 
 
 class VideoEntry(Entry):
@@ -96,6 +103,9 @@ class VideoEntry(Entry):
 
     def list_str(self):
         return f"{self.channel} => {self.title}"
+
+    def open(self):
+        os.system(f"mpv {self.url}")
 
     def __str__(self):
         return f"YOUTUBE\n{super().__str__()}\nID: {self.video_id}"

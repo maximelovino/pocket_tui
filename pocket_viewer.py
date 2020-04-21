@@ -27,7 +27,7 @@ def choose_video(xs: List[VideoEntry]) -> VideoEntry:
 def watch_youtube(videos: List[VideoEntry], pocket_client: Pocket):
     chosen = choose_video(videos)
     print(chosen)
-    os.system(f"mpv {chosen.url}")
+    chosen.open()
     # TODO replace with inquirer confirm
     to_delete = input("Do you want to archive the entry?[y/N]")
     if to_delete == 'y':
@@ -122,6 +122,11 @@ def bulk_operations(entries: List[Entry]) -> None:
     ]
     answers = prompt(questions)
     print(answers)
+    if answers["operation"] == "open":
+        chosen = answers['chosen_entries']
+        for x in chosen:
+            x.open()
+
 
 
 running = True
