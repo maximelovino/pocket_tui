@@ -126,6 +126,16 @@ def bulk_operations(entries: List[Entry], client: Pocket) -> None:
     if answers["operation"] == "open":
         for x in chosen:
             x.open()
+        questions = [
+            {
+                'type': 'confirm',
+                'name': 'confirm',
+                'message': 'Do you want to archive as well?'
+            }
+        ]
+        confirm = prompt(questions)
+        if confirm["confirm"]:
+            client.archive(chosen)
     else:
         questions = [
             {

@@ -66,7 +66,7 @@ class ArticleEntry(Entry):
         super().__init__(entry_dict)
 
     def list_str(self):
-        return f"{self.title} // {self.domain}"
+        return f"{self.domain} => {self.title}"
 
     def open(self):
         webbrowser.open(self.url, new=2, autoraise=False)
