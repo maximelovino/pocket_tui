@@ -57,6 +57,9 @@ class Entry():
     def open(self):
         pass
 
+    def domain_filter(self) -> str:
+        pass
+
     def __str__(self):
         return f"{self.id}\n{self.title}\n{self.url}\nAdded:{self.added} - Updated: {self.updated}\nDomain: {self.domain}"
 
@@ -70,6 +73,9 @@ class ArticleEntry(Entry):
 
     def open(self):
         webbrowser.open(self.url, new=2, autoraise=False)
+
+    def domain_filter(self):
+        return self.domain
 
 
 class VideoEntry(Entry):
@@ -106,6 +112,9 @@ class VideoEntry(Entry):
 
     def open(self):
         os.system(f"mpv {self.url}")
+
+    def domain_filter(self):
+        return self.channel
 
     def __str__(self):
         return f"YOUTUBE\n{super().__str__()}\nID: {self.video_id}"
