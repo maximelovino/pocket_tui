@@ -38,6 +38,7 @@ def youtube(all_entries: List[Entry], filter_func: Callable[[List[Entry]], Union
     yt_list = filter_youtube(all_entries)
     filtered = apply_filter(yt_list, filter_func)
     if len(filtered) == 0:
+        print("No entries in the filtered list")
         return
     watch_youtube(filtered, pocket_client)
 
@@ -101,8 +102,7 @@ def main_menu() -> str:
             'message': 'What do you want to do?',
             'choices': [
                 {'name': "Watch YouTube videos", 'value': youtube},
-                {'name': "Bulk operations", 'value': bulk_operations},
-                {'name': "Quit", 'value': quit}
+                {'name': "Bulk operations", 'value': bulk_operations}
             ]
         },
         {
@@ -148,7 +148,9 @@ def bulk_operations(all_entries: List[Entry], filter_func: Callable[[List[Entry]
     entries = apply_filter(all_entries, filter_func)
 
     if len(entries) == 0:
+        print("No entries in the filtered list")
         return
+
     questions = [
         {
             'type': 'checkbox',
@@ -200,16 +202,24 @@ def bulk_operations(all_entries: List[Entry], filter_func: Callable[[List[Entry]
                 client.delete(chosen)
 
 
+
+
+
 running = True
 
 pocket_client = Pocket()
 
-while running:
-    full_list = refresh(pocket_client)
-    menu_choice = main_menu()
-    menu_choice['menu_choice'](
-        full_list, menu_choice['filter_choice'], pocket_client)
+try:
+    while running:
+        full_list = refresh(pocket_client)
+        menu_choice = main_menu()
+        menu_choice['menu_choice'](
+            full_list, menu_choice['filter_choice'], pocket_client)
+except (KeyboardInterrupt,KeyError) as e :
+    print("Quitting...")
+    exit(0)
+except Exception as error:
+    print("An error happened")
+    print(error)
+    exit(1)
 
-
-def quit(xs: List[Entry], filter_func: Callable[[List[Entry]], Union[List[Entry], Dict[str, List[Entry]]]], client: Pocket) -> None:
-    exit(0)  # TODO not classy
