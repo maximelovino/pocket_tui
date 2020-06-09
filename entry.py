@@ -5,24 +5,12 @@ import tldextract
 from typing import List, Tuple
 import diskcache as dc
 from dotenv import load_dotenv
+from youtube import Youtube
 import os
 
-import googleapiclient.discovery
-import googleapiclient.errors
-
-load_dotenv()
 
 YOUTUBE_LONG_DOMAIN = "youtube.com"
 YOUTUBE_SHORT_DOMAIN = "youtu.be"
-youtube_cache = dc.Cache("youtube_tmp")
-YOUTUBE_KEY = os.getenv("YOUTUBE_KEY")
-
-
-api_service_name = "youtube"
-api_version = "v3"
-
-youtube = googleapiclient.discovery.build(
-    api_service_name, api_version, developerKey=YOUTUBE_KEY)
 
 
 class Entry():
@@ -38,18 +26,18 @@ class Entry():
         self.domain = extracted.registered_domain
 
     @staticmethod
-    def parse(entry_dict) -> '__class__':
+    def parse(entry_dict, youtube: Youtube) -> '__class__':
         url = entry_dict['resolved_url']
         extracted = tldextract.extract(url)
         domain = extracted.registered_domain
         if domain == YOUTUBE_LONG_DOMAIN or domain == YOUTUBE_SHORT_DOMAIN:
-            return VideoEntry(entry_dict)
+            return VideoEntry(entry_dict, youtube)
         else:
             return ArticleEntry(entry_dict)
 
     @staticmethod
-    def parse_list(xs) -> List['__class__']:
-        return list(map(lambda x: Entry.parse(x), xs))
+    def parse_list(xs, youtube: Youtube) -> List['__class__']:
+        return list(map(lambda x: Entry.parse(x,youtube), xs))
 
     def list_str(self) -> str:
         pass
@@ -79,8 +67,9 @@ class ArticleEntry(Entry):
 
 
 class VideoEntry(Entry):
-    def __init__(self, entry_dict):
+    def __init__(self, entry_dict, youtube: Youtube):
         super().__init__(entry_dict)
+        self.youtube = youtube
         self.video_id = self.extract_video_id()
         self.channel = self.retrieve_video_channel()
 
@@ -91,21 +80,7 @@ class VideoEntry(Entry):
             return urlparse(self.url).path[1:]
 
     def retrieve_video_channel(self) -> str:
-        if self.video_id in youtube_cache:
-            return youtube_cache[self.video_id]
-        else:
-            request = youtube.videos().list(
-                part="snippet",
-                id=self.video_id
-            )
-            response = request.execute()
-            try:
-                vid = response["items"][0]
-                channel_name = vid["snippet"]["channelTitle"]
-            except:
-                channel_name = "UNKNOWN CHANNEL"
-            youtube_cache[self.video_id] = channel_name
-            return channel_name
+        return self.youtube.retrieve_video_channel(self.video_id)
 
     def list_str(self):
         return f"{self.channel} => {self.title}"
