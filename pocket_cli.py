@@ -42,7 +42,7 @@ def youtube(all_entries: List[Entry], filter_func: Callable[[List[Entry]], Union
     if len(filtered) == 0:
         print("No entries in the filtered list")
         return
-    watch_youtube(filtered, pocket_client)
+    watch_youtube(filtered, client)
 
 
 def filter_youtube(entries: List[Entry]) -> List[VideoEntry]:
@@ -50,7 +50,7 @@ def filter_youtube(entries: List[Entry]) -> List[VideoEntry]:
 
 
 def refresh(client: Pocket) -> List[Entry]:
-    full_list = pocket_client.retrieve_full_list()
+    full_list = client.retrieve_full_list()
     return full_list
 
 
@@ -204,26 +204,27 @@ def bulk_operations(all_entries: List[Entry], filter_func: Callable[[List[Entry]
                 client.delete(chosen)
 
 
+def main_loop():
+    running = True
+    config = Config()
+    cache = Cache()
+    youtube_client = Youtube(config, cache)
+    pocket_client = Pocket(config, cache, youtube_client)
+
+    try:
+        while running:
+            full_list = refresh(pocket_client)
+            menu_choice = main_menu()
+            menu_choice['menu_choice'](
+                full_list, menu_choice['filter_choice'], pocket_client)
+    except (KeyboardInterrupt, KeyError) as e:
+        print("Quitting...")
+        exit(0)
+    except Exception as error:
+        print("An error happened")
+        print(error)
+        exit(1)
 
 
-
-running = True
-config = Config()
-cache = Cache()
-youtube_client = Youtube(config, cache)
-pocket_client = Pocket(config, cache, youtube_client)
-
-try:
-    while running:
-        full_list = refresh(pocket_client)
-        menu_choice = main_menu()
-        menu_choice['menu_choice'](
-            full_list, menu_choice['filter_choice'], pocket_client)
-except (KeyboardInterrupt,KeyError) as e :
-    print("Quitting...")
-    exit(0)
-except Exception as error:
-    print("An error happened")
-    print(error)
-    exit(1)
-
+if __name__ == "__main__":
+    main_loop()
