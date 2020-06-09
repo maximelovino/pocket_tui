@@ -1,11 +1,13 @@
 import requests
 import json
-import os
 import webbrowser
 from dotenv import load_dotenv
 from PyInquirer import prompt
 import time
 from pocket import Pocket
+from config import Config
+from cache import Cache
+from youtube import Youtube
 from typing import List, Dict, Tuple, Callable, Union
 from entry import Entry, VideoEntry, ArticleEntry
 
@@ -206,8 +208,10 @@ def bulk_operations(all_entries: List[Entry], filter_func: Callable[[List[Entry]
 
 
 running = True
-
-pocket_client = Pocket()
+config = Config()
+cache = Cache()
+youtube_client = Youtube(config, cache)
+pocket_client = Pocket(config, cache, youtube_client)
 
 try:
     while running:

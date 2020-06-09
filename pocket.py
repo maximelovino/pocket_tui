@@ -5,7 +5,9 @@ import requests
 import json
 from entry import Entry
 from typing import List
-
+from config import Config
+from cache import Cache
+from youtube import Youtube
 
 BASE_POCKET_URL = "https://getpocket.com/v3/"
 BASE_HEADERS = {"Content-Type": "application/json",
@@ -15,25 +17,23 @@ TOKEN_CACHE_FILE = ".token"
 
 
 class Pocket():
-    def __init__(self):
+    def __init__(self, config: Config, cache: Cache, youtube: Youtube):
         super().__init__()
-        load_dotenv()
-        self.key = os.getenv('POCKET_CONSUMER_KEY')
+        self.key = config.pocket_key
+        self.cache = cache
+        self.youtube = youtube
         self.token = self.cached_authentication()
         # print(f"Authenticated with key {self.key} and token {self.token}")
 
     def cached_authentication(self) -> str:
-        if os.path.exists(TOKEN_CACHE_FILE):
-            print("Using cache for authentication")
-            with open(TOKEN_CACHE_FILE, 'r') as f:
-                token = f.read()
-                return token
-        else:
-            print("Need to authenticate")
-            token = self.authenticate()
-            with open(TOKEN_CACHE_FILE, 'w') as f:
-                f.write(token)
-            return token
+        cached_token = self.cache.get_cached_token()
+        if cached_token is not None:
+            print("Using cache for auth")
+            return cached_token
+        print("Need new authentication")
+        token = self.authenticate()
+        self.cache.save_cached_token(token)
+        return token
 
     def authenticate(self) -> str:
         request_url = f"{BASE_POCKET_URL}oauth/request"
@@ -65,7 +65,7 @@ class Pocket():
             get_url, data=json.dumps(get_payload), headers=BASE_HEADERS)
         response = get_request.json()
         dictionnary = response['list']
-        entries = Entry.parse_list(dictionnary.values())
+        entries = Entry.parse_list(dictionnary.values(), self.youtube)
         return entries
     
     def archive(self, entries: List[Entry]):
