@@ -4,12 +4,12 @@ import webbrowser
 from dotenv import load_dotenv
 from PyInquirer import prompt
 import time
-from pocket import Pocket
-from config import Config
-from cache import Cache
-from youtube import Youtube
+from .pocket import Pocket
+from .config import Config
+from .cache import Cache
+from .youtube import Youtube
 from typing import List, Dict, Tuple, Callable, Union
-from entry import Entry, VideoEntry, ArticleEntry
+from .entry import Entry, VideoEntry, ArticleEntry
 
 
 def choose_video(xs: List[VideoEntry]) -> VideoEntry:
