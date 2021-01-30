@@ -4,3 +4,4 @@ venv/
 .token
 __pycache__/
 youtube_tmp/
+.vscode/
