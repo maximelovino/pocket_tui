@@ -1,6 +1,6 @@
 
-from config import Config
-from cache import Cache
+from .config import Config
+from .cache import Cache
 import googleapiclient.discovery
 import googleapiclient.errors
 

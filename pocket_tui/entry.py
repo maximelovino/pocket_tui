@@ -5,7 +5,7 @@ import tldextract
 from typing import List, Tuple
 import diskcache as dc
 from dotenv import load_dotenv
-from youtube import Youtube
+from .youtube import Youtube
 import os
 
 

@@ -3,11 +3,11 @@ import os
 import webbrowser
 import requests
 import json
-from entry import Entry
+from .entry import Entry
 from typing import List
-from config import Config
-from cache import Cache
-from youtube import Youtube
+from .config import Config
+from .cache import Cache
+from .youtube import Youtube
 
 BASE_POCKET_URL = "https://getpocket.com/v3/"
 BASE_HEADERS = {"Content-Type": "application/json",
