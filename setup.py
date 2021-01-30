@@ -34,7 +34,7 @@ setuptools.setup(
         'google-auth==1.14.0',
         'google-auth-httplib2==0.0.3',
         'googleapis-common-protos==1.51.0',
-        'httplib2==0.17.2',
+        'httplib2==0.18.0',
         'idna==2.8',
         'isort==4.3.21',
         'lazy-object-proxy==1.4.3',
