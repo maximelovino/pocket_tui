@@ -56,7 +56,7 @@ setuptools.setup(
         'six==1.13.0',
         'tldextract==2.2.2',
         'uritemplate==3.0.1',
-        'urllib3==1.25.7',
+        'urllib3==1.25.8',
         'wcwidth==0.1.9',
         'wrapt==1.11.2'
     ]
