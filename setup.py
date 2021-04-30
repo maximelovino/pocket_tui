@@ -52,7 +52,7 @@ setuptools.setup(
         'regex==2020.4.4',
         'requests==2.22.0',
         'requests-file==1.4.3',
-        'rsa==4.0',
+        'rsa==4.7',
         'six==1.13.0',
         'tldextract==2.2.2',
         'uritemplate==3.0.1',
