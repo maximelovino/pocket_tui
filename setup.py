@@ -26,7 +26,7 @@ setuptools.setup(
         'astroid==2.3.3',
         'autopep8==1.4.4',
         'cachetools==4.1.0',
-        'certifi==2019.11.28',
+        'certifi==2022.12.7',
         'chardet==3.0.4',
         'diskcache==4.1.0',
         'google-api-core==1.17.0',
